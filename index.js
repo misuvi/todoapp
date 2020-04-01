@@ -5,19 +5,19 @@ let tasks = [];
 
 function display(data)
 {
-    let index=1;
-    data.forEach(element => {
-        console.log(`${index++}. ${element.task}`)
+    data.forEach((element,index) => {
+        console.log(`${index+1}. ${element.task}`)
     });
 }
+
+const operation=argv[0].toLowerCase();
 // console.log(uuid);
 // console.log('------------------------------------');
 // console.log(argv);
 // console.log('------------------------------------');
 // console.log(argv[1])
-switch(argv[0]){
-    case 'insert':case 'Insert':case 'INSERT':
-    case 'add':case 'Add':case 'ADD'
+switch(operation){
+    case 'insert':case 'add'
             :   if(argv[1]){
                     let currentData= fs.readFileSync('todo.json','utf8')
                     // console.log(currentData.length);
@@ -38,9 +38,7 @@ switch(argv[0]){
                     console.log('Please enter a valid input!');  
                 
                 break;
-    case 'update':case 'Update':case 'UPDATE':
-    case 'change':case 'Change':case 'CHANGE':
-    case 'edit':case 'Edit':case 'EDIT' 
+    case 'update':case 'change':case 'edit' 
             :   if(!argv[1]||!argv[2])
                 {
                     console.log('Please Enter valid details to update!');
@@ -50,27 +48,34 @@ switch(argv[0]){
                     if(!jsonData.length || jsonData==='[]')
                         console.log('Sorry, There are no tasks at present.')
                     else{
-                        let flag=0;
+                        // let flag=0;
                         let upid=argv[1]
                         let updata=argv.slice(2).join(' ');;
                         tasks=JSON.parse(jsonData);
-                        tasks.forEach(itask => {
-                            if(itask.id==upid)
-                            {
-                                itask.task=updata;
-                                fs.writeFile('todo.json',JSON.stringify(tasks,null,1),err=>{if(err){console.log(err)}})
-                                flag++;
-                                console.log(`Task with id:${upid} successfully updated to \"${updata}\" :)`)
-                            }
-                        });
-                        if(!flag)
+                        let index=tasks.findIndex(itask=>itask.id===upid)
+                        if(index===-1){
                             console.log('There\'s no task with the entered id!');
+                        }
+                        else{
+                            console.log(`Task with id:${upid} (previous value "${tasks[index].task}") successfully updated to \"${updata}\" :)`)
+                            tasks[index].task=updata;
+                            fs.writeFile('todo.json',JSON.stringify(tasks,null,1),err=>{if(err){console.log(err)}})
+                        }
+                        // tasks.forEach(itask => {
+                        //     if(itask.id==upid)
+                        //     {
+                        //         itask.task=updata;
+                        //         fs.writeFile('todo.json',JSON.stringify(tasks,null,1),err=>{if(err){console.log(err)}})
+                        //         flag++;
+                        //         console.log(`Task with id:${upid} successfully updated to \"${updata}\" :)`)
+                        //     }
+                        // });
+                        // if(!flag)
+                            // console.log('There\'s no task with the entered id!');
                     }
                 }
                 break;
-    case 'show':case 'Show':case 'SHOW':
-    case 'display':case 'Display':case 'DISPLAY':
-    case 'list':case 'List':case 'LIST' 
+    case 'show':case 'display':case 'list'
             :   let fileData=fs.readFileSync('todo.json','utf8');
                 if(!fileData.length || fileData==='[]')
                     console.log('Oops! There\'re no tasks!')
@@ -78,9 +83,8 @@ switch(argv[0]){
                     tasks=JSON.parse(fileData);
                     if(argv[1]=='id')
                     {
-                        let index=1;
-                        tasks.forEach(element => {
-                            console.log(`${index++}. ${element.id}`)
+                        tasks.forEach((element,index)=> {
+                            console.log(`${index+1}. ${element.id}`)
                         });
                     }
                     else{
@@ -88,9 +92,7 @@ switch(argv[0]){
                     }
                 }
                 break;
-    case 'delete':case 'Delete':case 'DELETE':
-    case 'remove':case 'Remove':case 'REMOVE':
-    case 'completed':case 'Completed':case 'COMPLETED' 
+    case 'delete':case 'remove':case 'completed'
             :   if(!argv[1])
                     console.log('Please Enter a task id to remove -_-')
                 else{
@@ -104,23 +106,26 @@ switch(argv[0]){
                         let delid=argv[1];
                         let i=0;
                         tasks=JSON.parse(fileData);
-                        for(;i<tasks.length;i++)
-                        {
-                            if(tasks[i].id===delid)
-                                break;
-                        }
-                        // tasks.forEach(itask=>{
-                        //     if(itask.id===delid)
-                        //         break;
-                        //     i++;
-                        // });
-                        if(i>=tasks.length)
-                            console.log('There\'s no task with the entered id!');
-                        else{
-                            tasks.splice(i,1);
+                        let oldLength=tasks.length;
+                        tasks=tasks.filter(itask=>itask.id!==delid);
+                        if(tasks.length!==oldLength){
                             fs.writeFile('todo.json',JSON.stringify(tasks,null,1),err=>{if(err){console.log(err)}});
-                            console.log(`Task with id:${delid} deleted successfully :)`);
+                            console.log(`Task with id : ${delid} deleted successfully :)`);
                         }
+                        else
+                            console.log('There\'s no task with the entered id!');
+                        // for(;i<tasks.length;i++)
+                        // {
+                        //     if(tasks[i].id===delid)
+                        //         break;
+                        // }
+                        // if(i>=tasks.length)
+                        //     console.log('There\'s no task with the entered id!');
+                        // else{
+                        //     tasks.splice(i,1);
+                        //     fs.writeFile('todo.json',JSON.stringify(tasks,null,1),err=>{if(err){console.log(err)}});
+                        //     console.log(`Task with id:${delid} deleted successfully :)`);
+                        // }
                     }
                 }
                 break;
