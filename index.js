@@ -35,7 +35,7 @@ switch(argv[0]){
                     console.log('Task Added Successfully :)');
                 }
                 else
-                    console.log('Please enter a valid input');  
+                    console.log('Please enter a valid input!');  
                 
                 break;
     case 'update':case 'Update':case 'UPDATE':
@@ -43,7 +43,7 @@ switch(argv[0]){
     case 'edit':case 'Edit':case 'EDIT' 
             :   if(!argv[1]||!argv[2])
                 {
-                    console.log('Please Enter valid details to update');
+                    console.log('Please Enter valid details to update!');
                 }
                 else{
                     let jsonData=fs.readFileSync('todo.json','utf8')
@@ -74,8 +74,19 @@ switch(argv[0]){
             :   let fileData=fs.readFileSync('todo.json','utf8');
                 if(!fileData.length || fileData==='[]')
                     console.log('Oops! There\'re no tasks!')
-                else
-                    display(tasks=JSON.parse(fileData));
+                else{
+                    tasks=JSON.parse(fileData);
+                    if(argv[1]=='id')
+                    {
+                        let index=1;
+                        tasks.forEach(element => {
+                            console.log(`${index++}. ${element.id}`)
+                        });
+                    }
+                    else{
+                        display(tasks);
+                    }
+                }
                 break;
     case 'delete':case 'Delete':case 'DELETE':
     case 'remove':case 'Remove':case 'REMOVE':
@@ -114,5 +125,5 @@ switch(argv[0]){
                 }
                 break;
     default 
-            :   console.log('Invalid Operation');
+            :   console.log('Please Specify an operation as command line argument! You can Insert, Delete, Update and Display tasks.');
 }
